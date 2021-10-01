@@ -14,20 +14,18 @@ namespace Hangman
         private readonly Player _player;
 
         private int NumberOfGuesses =>
-            _correctGuesses.Length + _incorrectGuesses.Length + _incorrectWordGuesses.Count;
+            _numberOfCorrectGuesses + _incorrectGuesses.Length + _incorrectWordGuesses.Count;
 
         private int _secretWordIndex;
 
         private string[] _secreteWords;
-
+        private int _numberOfCorrectGuesses;
         private char[] _correctGuesses;
         private StringBuilder _incorrectGuesses;
         private List<string> _incorrectWordGuesses;
 
         private int NumberOfIncorrectGuesses =>
             _incorrectGuesses.Length + _incorrectWordGuesses.Count;
-
-        private StringBuilder _maskedSecretWord;
 
         public Hangman()
         {
@@ -37,24 +35,15 @@ namespace Hangman
 
         public void NewGame()
         {
-
             ResetGuesses();
             SetRandomSecretWordIndex();
-            MaskSecretWord();
-
-        }
-
-        private void MaskSecretWord()
-        {
-            _maskedSecretWord = new StringBuilder(WordToGuess.Length);
-            _maskedSecretWord.Append("".PadRight(WordToGuess.Length, '_'));
-            // Reveal any spaces
-            RevealToPlayer(' ');
         }
 
         private void ResetGuesses()
         {
-            _correctGuesses = Array.Empty<char>();
+            _correctGuesses = new char[WordToGuess.Length];
+            Array.Fill(_correctGuesses, '_');
+            _numberOfCorrectGuesses = 0;
             _incorrectGuesses = new StringBuilder();
             _incorrectWordGuesses = new List<string>();
         }
@@ -71,7 +60,7 @@ namespace Hangman
             {
                 if (WordToGuess[i] == newChar)
                 {
-                    _maskedSecretWord[i] = newChar;
+                    _correctGuesses[i] = newChar;
                 }
             }
         }
@@ -83,7 +72,7 @@ namespace Hangman
                 Draw();
 
                 // Player won
-                if (_maskedSecretWord.ToString() == WordToGuess)
+                if (!_correctGuesses.Contains('_'))
                 {
                     PlayerWon();
                 }
@@ -94,7 +83,7 @@ namespace Hangman
                     PlayerLost();
                 }
 
-                if (_maskedSecretWord.ToString() != WordToGuess && NumberOfGuesses < MaxNumberOfGuesses)
+                if (_correctGuesses.ToString() != WordToGuess && NumberOfGuesses < MaxNumberOfGuesses)
                 {
                     Guess();
                 }
@@ -199,8 +188,7 @@ $$    $$/ $$    $$ |$$ | $$ | $$ |$$       |      $$ |$$    $$/ /     $$/   $$  
         {
             if (word == WordToGuess)
             {
-                _maskedSecretWord.Clear();
-                _maskedSecretWord.Append(word);
+                _correctGuesses = word.ToCharArray();
             }
             else
             {
@@ -231,9 +219,7 @@ $$    $$/ $$    $$ |$$ | $$ | $$ |$$       |      $$ |$$    $$/ /     $$/   $$  
                 return;
             }
 
-            Array.Resize(ref _correctGuesses, _correctGuesses.Length+1);
-            _correctGuesses[^1] = letter;
-
+            _numberOfCorrectGuesses++;
             RevealToPlayer(letter);
         }
 
@@ -283,7 +269,7 @@ $$    $$/ $$    $$ |$$ | $$ | $$ |$$       |      $$ |$$    $$/ /     $$/   $$  
             Console.WriteLine("Wins: {0} Loss {1}", _player.Wins, _player.Loss);
             DrawIncorrectGuesses();
             DrawHangMan();
-            Console.WriteLine("\n{0} letters: {1}", _maskedSecretWord.Length, _maskedSecretWord);
+            Console.WriteLine("\n{0} letters: {1}", _correctGuesses.Length, string.Join("", _correctGuesses));
             Console.WriteLine("\nGuesses: {0} of {1}", NumberOfGuesses, MaxNumberOfGuesses);
             Console.Write("Enter full word or a letter: ");
         }
