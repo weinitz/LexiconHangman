@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 
@@ -13,13 +14,13 @@ namespace Hangman
         private readonly Player _player;
 
         private int NumberOfGuesses =>
-            _correctGuesses.Count + _incorrectGuesses.Length + _incorrectWordGuesses.Count;
+            _correctGuesses.Length + _incorrectGuesses.Length + _incorrectWordGuesses.Count;
 
         private int _secretWordIndex;
 
         private string[] _secreteWords;
 
-        private List<char> _correctGuesses;
+        private char[] _correctGuesses;
         private StringBuilder _incorrectGuesses;
         private List<string> _incorrectWordGuesses;
 
@@ -53,7 +54,7 @@ namespace Hangman
 
         private void ResetGuesses()
         {
-            _correctGuesses = new List<char>();
+            _correctGuesses = Array.Empty<char>();
             _incorrectGuesses = new StringBuilder();
             _incorrectWordGuesses = new List<string>();
         }
@@ -230,7 +231,8 @@ $$    $$/ $$    $$ |$$ | $$ | $$ |$$       |      $$ |$$    $$/ /     $$/   $$  
                 return;
             }
 
-            _correctGuesses.Add(letter);
+            Array.Resize(ref _correctGuesses, _correctGuesses.Length+1);
+            _correctGuesses[^1] = letter;
 
             RevealToPlayer(letter);
         }
