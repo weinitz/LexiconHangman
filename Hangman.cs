@@ -297,7 +297,20 @@ $$    $$/ $$    $$ |$$ | $$ | $$ |$$       |      $$ |$$    $$/ /     $$/   $$  
             get
             {
                 if (_secreteWords != null) return _secreteWords;
-                _secreteWords = ReadWordsFile();
+                try
+                {
+                    _secreteWords = ReadWordsFile();
+                }
+                catch (Exception)
+                {
+                    _secreteWords = new[]
+                    {
+                        "svenska",
+                        "lexicon",
+                        "programmering"
+                    };
+                }
+
                 return _secreteWords;
             }
         }
