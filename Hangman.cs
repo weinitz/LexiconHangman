@@ -13,18 +13,18 @@ namespace Hangman
         private readonly Player _player;
 
         private int NumberOfGuesses =>
-            _correctGuesses.Count + _incorrectGuesses.Count + _incorrectWordGuesses.Count;
+            _correctGuesses.Count + _incorrectGuesses.Length + _incorrectWordGuesses.Count;
 
         private int _secretWordIndex;
 
         private string[] _secreteWords;
 
         private List<char> _correctGuesses;
-        private List<char> _incorrectGuesses;
+        private StringBuilder _incorrectGuesses;
         private List<string> _incorrectWordGuesses;
 
         private int NumberOfIncorrectGuesses =>
-            _incorrectGuesses.Count + _incorrectWordGuesses.Count;
+            _incorrectGuesses.Length + _incorrectWordGuesses.Count;
 
         private StringBuilder _maskedSecretWord;
 
@@ -54,7 +54,7 @@ namespace Hangman
         private void ResetGuesses()
         {
             _correctGuesses = new List<char>();
-            _incorrectGuesses = new List<char>();
+            _incorrectGuesses = new StringBuilder();
             _incorrectWordGuesses = new List<string>();
         }
 
@@ -218,14 +218,15 @@ $$    $$/ $$    $$ |$$ | $$ | $$ |$$       |      $$ |$$    $$/ /     $$/   $$  
             {
                 throw new IsNotLetterException("Input is not a letter");
             }
-            if (_correctGuesses.Contains(letter) || _incorrectGuesses.Contains(letter))
+
+            if (_correctGuesses.Contains(letter) || _incorrectGuesses.ToString().Contains(letter))
             {
                 throw new LetterAlreadyInUseException("Letter is already in use");
             }
 
             if (!WordToGuess.Contains(letter))
             {
-                _incorrectGuesses.Add(letter);
+                _incorrectGuesses.Append(letter);
                 return;
             }
 
@@ -268,9 +269,9 @@ $$    $$/ $$    $$ |$$ | $$ | $$ |$$       |      $$ |$$    $$/ /     $$/   $$  
                     string.Join(", ", _incorrectWordGuesses.ToArray()));
             }
 
-            if (_incorrectGuesses.Count > 0)
+            if (_incorrectGuesses.Length > 0)
             {
-                Console.WriteLine("Incorrect letter guesses: {0}", string.Join(", ", _incorrectGuesses.ToArray()));
+                Console.WriteLine("Incorrect letter guesses: {0}", _incorrectGuesses);
             }
         }
 
